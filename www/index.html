@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>json-server</title>
+    <meta charset="utf-8">
+</head>
+<body>
+<button>添加post</button>
+<button>删除post</button>
+<button>跟新post</button>
+<br><br>
+<div id="box">
+    <input type="text" name="title">
+    <input type="button" value="提交" onclick="add()">
+</div>
+<div id="list">
+</div>
+<script type="text/javascript">
+    var api_url = "http://localhost:3000";
+
+    function render(){
+
+    }
+
+    function init(){
+        var posts = fetch(api_url+'/posts').then(res => {
+            return res.json();
+        }).then(result => {
+            let len = result.length;
+            if(len>0){
+               let list = document.querySelector('#list');
+
+               let str=``;
+
+               for(let i=len-1; i>=0; i--){
+                    str += `<div><span>${result[i].title}</span><button data-id='${result[i].id}'>删除</button></div>`;
+               }
+
+               list.innerHTML = str;
+               alert(list.innerHTML);
+            }
+        })
+    }
+
+    function add(){
+        let title = document.querySelector('input[name="title"]').value;
+        let id = new Date().getTime();
+        fetch(api_url+"/posts",{
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          body:`title=${title}&author=wang_hes&id=${id}`
+        }).then(res=>{
+            return res.json();
+        }).then(result=>{
+            if(result.id){
+                 var posts = fetch(api_url+'/posts').then(res => {
+                    return res.json();
+                }).then(result => {
+                    console.log(result)
+                });
+            }
+        });
+    }
+
+    init();
+</script>
+</body>
+</html>

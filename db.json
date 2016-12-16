@@ -1,0 +1,24 @@
+{
+  "posts": [
+    {
+      "id": "1481887905234",
+      "title": "json-server",
+      "author": "typicode"
+    },
+    {
+      "title": "asda1",
+      "author": "wang_hes",
+      "id": "1481887905260"
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "body": "some comment",
+      "postId": 1
+    }
+  ],
+  "profile": {
+    "name": "typicode"
+  }
+}
