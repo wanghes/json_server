@@ -1,70 +1,98 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>json-server</title>
     <meta charset="utf-8">
 </head>
+
 <body>
-<button>添加post</button>
-<button>删除post</button>
-<button>跟新post</button>
-<br><br>
-<div id="box">
-    <input type="text" name="title">
-    <input type="button" value="提交" onclick="add()">
-</div>
-<div id="list">
-</div>
-<script type="text/javascript">
+    <button>添加post</button>
+    <button>更新post</button>
+    <br>
+    <br>
+    <div id="box">
+        <input type="text" name="title">
+        <input type="button" value="提交" onclick="add(this)">
+    </div>
+    <div id="list">
+    </div>
+    <script type="text/javascript">
     var api_url = "http://localhost:3000";
 
-    function render(){
+    function render(nodeId, result) {
+      let len = result.length;
+        if (len > 0) {
+            let list = document.querySelector(nodeId);
+            let str = ``;
 
+            for (let i = len - 1; i >= 0; i--) {
+                str += `<div><span>${result[i].title}</span><button onclick='del(${result[i].id})'>删除</button></div>`;
+            }
+
+            list.innerHTML = str;
+
+        }
     }
 
-    function init(){
-        var posts = fetch(api_url+'/posts').then(res => {
+    function init() {
+        var posts = fetch(api_url + '/posts').then(res => {
             return res.json();
         }).then(result => {
-            let len = result.length;
-            if(len>0){
-               let list = document.querySelector('#list');
-
-               let str=``;
-
-               for(let i=len-1; i>=0; i--){
-                    str += `<div><span>${result[i].title}</span><button data-id='${result[i].id}'>删除</button></div>`;
-               }
-
-               list.innerHTML = str;
-               alert(list.innerHTML);
-            }
+            render('#list', result);
         })
     }
 
-    function add(){
+    function getPrevNode(node){
+      let prev = node.previousSibling;
+      if(prev.nodeType == 1){
+        return node.previousSibling;
+      }else{
+        getPrevNode(prev);
+      }
+    }
+
+    function add(self) {
         let title = document.querySelector('input[name="title"]').value;
         let id = new Date().getTime();
-        fetch(api_url+"/posts",{
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          body:`title=${title}&author=wang_hes&id=${id}`
-        }).then(res=>{
+       // alert(self.previousSibling.nodeType)
+        getPrevNode(self.previousSibling).value='';
+
+        fetch(api_url + "/posts", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `title=${title}&author=wang_hes&id=${id}`
+        }).then(res => {
             return res.json();
-        }).then(result=>{
-            if(result.id){
-                 var posts = fetch(api_url+'/posts').then(res => {
+        }).then(result => {
+            if (result.id) {
+
+                var posts = fetch(api_url + '/posts').then(res => {
                     return res.json();
                 }).then(result => {
-                    console.log(result)
+                    render('#list', result);
                 });
             }
         });
     }
 
+
+    function del(id){
+      //alert(id)
+      fetch(api_url + "/posts/"+id, {
+            method: "delete"
+        }).then(res => {
+            return res.json();
+        }).then(result => {
+          typeof result =="object" ? location.reload():alert(`删除${id}失败`);
+
+        });
+    }
+
     init();
-</script>
+    </script>
 </body>
+
 </html>
